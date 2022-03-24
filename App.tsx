@@ -28,11 +28,12 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <NavigationContainer>
-        <AppRoutes />
-      </NavigationContainer>
-    </ThemeProvider>
-
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ThemeProvider theme={theme}>
+        <NavigationContainer>
+          <AppRoutes />
+        </NavigationContainer>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
