@@ -1,5 +1,5 @@
 import styled from 'styled-components/native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { RectButton } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize';
 import { Feather } from '@expo/vector-icons';
 
@@ -7,7 +7,7 @@ interface CategoryProps {
   isActive: boolean;
 }
 
-export const Container = styled(GestureHandlerRootView)`
+export const Container = styled(RectButton)`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
 `;
