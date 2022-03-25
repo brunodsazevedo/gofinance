@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { ActivityIndicator } from 'react-native';
 
 import { useFocusEffect } from '@react-navigation/native';
 
 import { HighlightCard } from '../../components/HighlightCard';
 import { TransactionCard, TransactionCardProps } from '../../components/TransactionCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { useTheme } from 'styled-components';
 
 import {
   Container,
@@ -21,21 +24,45 @@ import {
   Title,
   TransactionList,
   LogoutButton,
+  LoadContainer,
 } from './styles';
 
 export interface DatalistProps extends TransactionCardProps {
   id: string;
 }
 
+interface HighlightProps {
+  amount: string;
+}
+
+interface HighlightData {
+  entries: HighlightProps;
+  expensives: HighlightProps;
+  total: HighlightProps;
+}
+
 export function Dashboard() {
-  const [data, setData] = useState<DatalistProps[]>([]);
+  const [ isLoading, setIsLoaging ] = useState(true);
+  const [ transactions, setTransactions ] = useState<DatalistProps[]>([]);
+  const [ highlightData, setHighlightData ] = useState<HighlightData>({} as HighlightData);
+
+  const theme = useTheme();
 
   async function loadTransactions() {
     const dataKey = '@gofinance:transactions';
     const response = await AsyncStorage.getItem(dataKey);
     const transactions = response ? JSON.parse(response) : [];
 
+    let entriesTotal = 0;
+    let expensiveTotal = 0;
+
     const transactionsFomatted: DatalistProps[] = transactions.map((item: DatalistProps) => {
+      if(item.type === 'positive') {
+        entriesTotal += Number(item.amount);
+      } else {
+        expensiveTotal += Number(item.amount);
+      }
+
       const amount = Number(item.amount)
         .toLocaleString('pt-BR', {
           style: 'currency',
@@ -58,10 +85,35 @@ export function Dashboard() {
       }
     });
 
-    setData(transactionsFomatted);
+    const total = entriesTotal - expensiveTotal;
+
+    setTransactions(transactionsFomatted);
+    setHighlightData({
+      entries: {
+        amount: entriesTotal.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }),
+      },
+
+      expensives: {
+        amount: expensiveTotal.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        })
+      },
+
+      total: {
+        amount: total.toLocaleString('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        })
+      }
+    });
+    setIsLoaging(false);
   }
 
-  useEffect(() => {
+  useEffect(() => {    
     loadTransactions();
   }, [])
 
@@ -71,55 +123,68 @@ export function Dashboard() {
 
   return (
     <Container>
-        <Header>
-          <UserWrapper>
-            <UserInfo>
-              <Photo source={{uri: 'https://github.com/brunodsazevedo.png'}} />
-              <User>
-                <UserGreeting>Olá</UserGreeting>
-                <UserName>Bruno</UserName>
-              </User>
-            </UserInfo>
-
-            <LogoutButton onPress={() => {}}>
-              <Icon name="power" />
-            </LogoutButton>
-          </UserWrapper>
-        </Header>
-
-        <HighlightCards>
-          <HighlightCard
-            type="up"
-            title="Entradas"
-            amount="R$ 17.400,00"
-            lastTransaction="Última entrada dia 13 de abril"
-          />
-
-          <HighlightCard
-            type="down"
-            title="Saídas"
-            amount="R$ 16.141,00"
-            lastTransaction="Última entrada dia 03 de abril"
-          />
-
-          <HighlightCard
-            type="total"
-            title="Total"
-            amount="R$ 16,141,00"
-            lastTransaction="Última entrada dia 13 de abril"
-          />
-
-        </HighlightCards>
-
-        <Transactions>
-          <Title>Listagem</Title>
-
-            <TransactionList
-              data={data}
-              keyExtractor={item => item.id}
-              renderItem={({ item }) => <TransactionCard data={item} />}
+      {
+        isLoading ? (
+          <LoadContainer>
+            <ActivityIndicator
+              color={theme.colors.primary}
+              size="large"
             />
-        </Transactions>
+          </LoadContainer>
+        ) : (
+          <>
+            <Header>
+              <UserWrapper>
+                <UserInfo>
+                  <Photo source={{uri: 'https://github.com/brunodsazevedo.png'}} />
+                  <User>
+                    <UserGreeting>Olá</UserGreeting>
+                    <UserName>Bruno</UserName>
+                  </User>
+                </UserInfo>
+
+                <LogoutButton onPress={() => {}}>
+                  <Icon name="power" />
+                </LogoutButton>
+              </UserWrapper>
+            </Header>
+
+            <HighlightCards>
+              <HighlightCard
+                type="up"
+                title="Entradas"
+                amount={highlightData.entries.amount}
+                lastTransaction="Última entrada dia 13 de abril"
+              />
+
+              <HighlightCard
+                type="down"
+                title="Saídas"
+                amount={highlightData.expensives.amount}
+                lastTransaction="Última entrada dia 03 de abril"
+              />
+
+              <HighlightCard
+                type="total"
+                title="Total"
+                amount={highlightData.total.amount}
+                lastTransaction="Última entrada dia 13 de abril"
+              />
+
+            </HighlightCards>
+
+            <Transactions>
+              <Title>Listagem</Title>
+
+                <TransactionList
+                  data={transactions}
+                  keyExtractor={item => item.id}
+                  renderItem={({ item }) => <TransactionCard data={item} />}
+                />
+            </Transactions>
+          </>
+        )
+      }
     </Container>
   )
 }
