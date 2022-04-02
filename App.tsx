@@ -8,11 +8,7 @@ import { ThemeProvider } from 'styled-components/'
 
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import { AppRoutes } from './src/routes/app.routes'
-
-import { SignIn } from './src/screens/SignIn';
-
-import { AuthProvider } from './src/hooks/auth';
+import { AuthProvider, useAuth } from './src/hooks/auth';
 
 import {
   useFonts,
@@ -23,28 +19,28 @@ import {
 
 import theme from './src/global/styles/theme';
 
-import { NavigationContainer } from '@react-navigation/native';
+import { Routes } from './src/routes';
 
 export default function App() {
+  const { userStorageLoading } = useAuth();
+
   const [ fontsLoaded ] = useFonts({
     Poppins_400Regular,
     Poppins_500Medium,
     Poppins_700Bold,
   });
 
-  if(!fontsLoaded) {
+  if(!fontsLoaded || userStorageLoading) {
     return <AppLoading />
   }
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <ThemeProvider theme={theme}>
-        <NavigationContainer>
-          <StatusBar barStyle="light-content" />
-          <AuthProvider>
-            <SignIn />
-          </AuthProvider>
-        </NavigationContainer>
+        <StatusBar barStyle="light-content" />
+        <AuthProvider>
+          <Routes />
+        </AuthProvider>
       </ThemeProvider>
     </GestureHandlerRootView>
   );
