@@ -2,10 +2,29 @@
   "expo": {
     "name": "gofinances",
     "slug": "gofinances",
-    "schema": "gofinances",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#5636D3"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#5636D3"
+      },
+      "package": "com.brunodsazevedo.gofinances"
+    },
+    "ios": {
+      "bundleIdentifier": "com.brunodsazevedo.gofinances"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "bce210d8-07ce-4195-9d11-26d6a5517b69"
+      }
+    }
   }
 }
