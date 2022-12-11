@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { RectButtonProps } from 'react-native-gesture-handler';
 
 import {
@@ -7,19 +7,26 @@ import {
 } from './styles';
 
 interface Props extends RectButtonProps {
-  title: string;
-  onPress: () => void;
+  title?: string;
+  rounded?: boolean;
+  children?: ReactNode;
+  onPress?: () => void;
 }
 
-export function Button({ title, onPress, ...rest }: Props) {
-  return(
+export function Button({ title, onPress, rounded = false, children, ...rest }: Props) {
+  return (
     <Container
+      rounded={rounded}
       onPress={onPress}
       {...rest}
     >
-      <Title>
-        {title}
-      </Title>
+      {title && (
+        <Title>
+          {title}
+        </Title>
+      )}
+
+      {children}
     </Container>
   );
 }

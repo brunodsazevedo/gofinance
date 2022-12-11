@@ -2,14 +2,19 @@ import styled from "styled-components/native";
 import { RectButton } from 'react-native-gesture-handler';
 import { RFValue } from "react-native-responsive-fontsize";
 
-export const Container = styled(RectButton)`
+interface ContainerProps {
+  rounded: boolean;
+}
+
+export const Container = styled(RectButton)<ContainerProps>`
   width: 100%;
-  border-radius: 5px;
+  border-radius: ${({ rounded }) => rounded ? '28px' : '5px'};
 
   padding: 18px;
 
-  background-color: ${({ theme }) => theme.colors.secondary};
   align-items: center;
+
+  background-color: ${({ theme }) => theme.colors.secondary};
 `;
 
 export const Title = styled.Text`
